@@ -3,32 +3,32 @@ name: software_config
 on: workflow_dispatch
 
 env:
-  TF_VAR_token: ${{ vars.TOKEN }}
-  TF_VAR_region: ${{ secrets.REGION }}
-  TF_VAR_ssh_pk: ${{ secrets.BASTION_SSH_PK }}
-  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  GHA_ROLE: ${{ secrets.GHA_ROLE }}
-  REGION: ${{ secrets.REGION }}
-  TERRAFORM_VERSION: ${{ secrets.TERRAFORM_VERSION }}
-
-permissions:
-  id-token: write
-  contents: read
+  SSH_PUBLIC_KEY: ${{ secrets.BASTION_SSH_PK }}
+  SSH_PRIVATE_KEY: ${{ secrets.BASTION_SSH_PRV }}
+  BASTION_HOST: ${{ secrets.BASTION_HOST }}
+  K3S_SERVER_IP: ${{ secrets.K3S_SERVER_IP }}
+  K3S_AGENT_IP: ${{ secrets.K3S_AGENT_IP }}
 
 jobs:
-  terraform_check:
+  install_jenkins:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ env.REGION  }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.GHA_ROLE }}
-
-      - name: Test
+      - name: Setup SSH Proxyjump Connection
         run: |
-          curl -IS https://www.rs.school
-          echo "Region: $REGION"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRV }}" > ~/.ssh/key_rsa
+          chmod 400 ~/.ssh/key_rsa
+          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
+          chmod 600 ~/.ssh/config
+
+      - name: Install Jenkins
+        run: |
+          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
+            echo "Jenkins is already deployed"
+          else 
+            echo "Installing Jenkins .... // ...." 
+            cat ${{ github.workspace }}/install_jenkins_dummy.sh | ssh k3s_server 'bash -s'
+          fi;

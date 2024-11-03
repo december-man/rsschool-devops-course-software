@@ -1,4 +1,4 @@
-# Jenkins Persistent Volume Configuration
+# Jenkins Persistent Volume Configuration that is used in jenkins_install.sh
 apiVersion: v1
 kind: PersistentVolume
 metadata:

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Create Separate Namespace for Jenkins
+kubectl create ns jenkins
 
 # Create Persistent Volume for Jenkins
 echo "apiVersion: v1
@@ -27,3 +29,13 @@ volumeBindingMode: WaitForFirstConsumer" >> ~/jenkins-volume.yaml
 sudo mkdir /data/jenkins -p
 sudo chown -R 1000:1000 /data/jenkins
 kubectl apply -f jenkins-volume.yaml
+
+# Create Custom Account for Jenkins
+curl https://raw.githubusercontent.com/jenkins-infra/jenkins.io/master/content/doc/tutorials/kubernetes/installing-jenkins-on-kubernetes/jenkins-sa.yaml >> ~/jenkins-sa.yaml
+kubectl apply -f jenkins-sa.yaml
+
+helm repo add jenkinsci https://charts.jenkins.io
+helm repo update
+helm search repo jenkinsci
+chart=jenkinsci/jenkins
+helm install jenkins -n jenkins -f jenkins-values.yaml $chart
