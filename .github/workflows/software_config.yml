@@ -5,6 +5,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - task_4
 
 env:
   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -34,5 +37,5 @@ jobs:
             echo "Jenkins is already deployed"
           else 
             echo "Installing Jenkins .... // ...." 
-            cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
+            cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s' # rm _dummy to install jenkins
           fi;
