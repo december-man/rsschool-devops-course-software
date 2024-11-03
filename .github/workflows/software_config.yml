@@ -5,9 +5,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - task_4
 
 env:
   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -33,7 +30,7 @@ jobs:
 
       - name: Install Jenkins
         run: |
-          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins' 2>/dev/null"; then
+          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
             echo "Jenkins is already deployed"
           else 
             echo "Installing Jenkins .... // ...." 
