@@ -2,9 +2,9 @@ name: software_config
 
 on: 
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
-      - task_4
+      - main
 
 env:
   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH passphrase
+      - name: Setup SSH Connection
         run: |
           mkdir -p ~/.ssh
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
@@ -28,15 +28,9 @@ jobs:
           echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
           chmod 600 ~/.ssh/config
 
-      # Debug print out the added identities. This will prove SSH_AUTH_SOCK
-      # is persisted across job steps
-      - name: Print ssh-add identities
-        run: |
-          ssh-add -l
-
       - name: Install Jenkins
         run: |
-          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jekins'"; then
+          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins' 2>/dev/null"; then
             echo "Jenkins is already deployed"
           else 
             echo "Installing Jenkins .... // ...." 
