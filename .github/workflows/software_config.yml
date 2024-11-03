@@ -36,9 +36,9 @@ jobs:
 
       - name: Install Jenkins
         run: |
-          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jekins'"; then
+          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
             echo "Jenkins is already deployed"
           else 
             echo "Installing Jenkins .... // ...." 
-            # cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
+            cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
           fi;
