@@ -7,6 +7,7 @@ on:
       - task_4
 
 env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
   SSH_PASSPHRASE: ${{secrets.SSH_PASSPHRASE}}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }}
   SSH_PUBLIC_KEY: ${{ secrets.BASTION_SSH_PK }}
