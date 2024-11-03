@@ -34,6 +34,10 @@ kubectl apply -f jenkins-volume.yaml
 curl https://raw.githubusercontent.com/jenkins-infra/jenkins.io/master/content/doc/tutorials/kubernetes/installing-jenkins-on-kubernetes/jenkins-sa.yaml >> ~/jenkins-sa.yaml
 kubectl apply -f jenkins-sa.yaml
 
+# Create Custom Configuration for Jenkins
+curl https://raw.githubusercontent.com/december-man/rsschool-devops-course-software/refs/heads/task_4/jenkins-values.yaml >> ~/jenkins-values.yaml
+kubectl apply -f jenkins-values.yaml
+
 helm repo add jenkinsci https://charts.jenkins.io
 helm repo update
 helm search repo jenkinsci

@@ -6,7 +6,7 @@ Host bastion_host
     StrictHostKeyChecking no
 
 ### Configuration for connecting to the k3s Server via the Bastion host
-Host k8s_server_node
+Host k3s_server_node
     HostName your_k3s_server_ip
     User ec2-user
     ProxyJump bastion_host

@@ -2,15 +2,11 @@ name: software_config
 
 on: 
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-
+  
 env:
   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-  SSH_PASSPHRASE: ${{secrets.SSH_PASSPHRASE}}
+  SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }}
-  SSH_PUBLIC_KEY: ${{ secrets.BASTION_SSH_PK }}
 
 jobs:
   install_jenkins:
@@ -34,5 +30,5 @@ jobs:
             echo "Jenkins is already deployed"
           else 
             echo "Installing Jenkins .... // ...." 
-            cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s' # rm _dummy to install jenkins
+            cat ${{ github.workspace }}/jenkins_install.sh | ssh k3s_server 'bash -s'
           fi;
