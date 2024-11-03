@@ -21,9 +21,12 @@ jobs:
 
       - name: Setup SSH passphrase
         run: |
+          mkdir -p ~/.ssh
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
+          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
+          chmod 600 ~/.ssh/config
 
       # Debug print out the added identities. This will prove SSH_AUTH_SOCK
       # is persisted across job steps
@@ -31,19 +34,11 @@ jobs:
         run: |
           ssh-add -l
 
-#      - name: Setup SSH Proxyjump Connection
-#        run: |
-#          mkdir -p ~/.ssh
-#          echo "${{ secrets.SSH_PRV }}" > ~/.ssh/key_rsa
-#          chmod 400 ~/.ssh/key_rsa
-#          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
-#          chmod 600 ~/.ssh/config
-
-#      - name: Install Jenkins
-#        run: |
-#          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
-#            echo "Jenkins is already deployed"
-#          else 
-#            echo "Installing Jenkins .... // ...." 
-#            cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
-#          fi;
+      - name: Install Jenkins
+        run: |
+          if ssh -o StrictHostKeyChecking=no k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
+            echo "Jenkins is already deployed"
+          else 
+            echo "Installing Jenkins .... // ...." 
+            # cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
+          fi;
