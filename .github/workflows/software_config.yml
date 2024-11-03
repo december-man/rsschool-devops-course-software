@@ -36,8 +36,9 @@ jobs:
 
       - name: Install Jenkins
         run: |
-          if ssh -o StrictHostKeyChecking=no k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
+          if ssh k3s_server "kubectl get pods -n jenkins | grep -q 'jenkins'"; then
             echo "Jenkins is already deployed"
+            ssh k3s_server "touch ~/pendeho.yaml"
           else 
             echo "Installing Jenkins .... // ...." 
             # cat ${{ github.workspace }}/jenkins_install_dummy.sh | ssh k3s_server 'bash -s'
