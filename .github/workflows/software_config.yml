@@ -1,7 +1,6 @@
-name: software_configuration
+name: software_config
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 env:
   TF_VAR_token: ${{ vars.TOKEN }}
