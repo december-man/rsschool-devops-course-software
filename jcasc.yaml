@@ -2,14 +2,9 @@
 # Demos repo: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos
 # Since we have a "naked" Jenkins build without any jobs, I'll touch the JCasC topic later throughout
 # the course in order to keep jenkins configurations as a code
+# Add RBAC configuration as a code
 
 jenkins:
-  agentProtocols:
-  - "JNLP4-connect"
-  - "Ping"
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
   clouds:
   - kubernetes:
       containerCap: 10
@@ -46,13 +41,6 @@ jenkins:
         slaveConnectTimeout: 100
         slaveConnectTimeoutStr: "100"
         yamlMergeStrategy: "override"
-  crumbIssuer:
-    standard:
-      excludeClientIPFromCrumb: true
-  disableRememberMe: false
-  labelAtoms:
-  - name: "built-in"
-  - name: "jenkins-jenkins-agent"
   markupFormatter: "plainText"
   mode: NORMAL
   myViewsTabBar: "standard"
@@ -103,7 +91,7 @@ jenkins:
         - "timezone"
         - "experimentalFlags"
         - mailer:
-            emailAddress: "alexpequalsmc@gmail.com"
+            emailAddress: "<XXX_XXX_XXX_XXX_XXX>@gmail.com" # attach your email
   slaveAgentPort: 50000
   updateCenter:
     sites:
