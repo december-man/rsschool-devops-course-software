@@ -51,8 +51,8 @@
 **screenshots:**
  * This directory contains all the screenshots related to the tasks, grouped by task folders.
 
-**ssh_config.md:**
- * This markdown file contains documentation related to SSH configuration. it eases the use of ssh ProxyJump, as well as fingerprint check ignores and other settings to fully automate ssh connection to the private k3s server node from gha pipeline
+**ssh_config_xmpl.sh:**
+ * This contains SSH configuration. It eases up the use of ssh ProxyJump, as well as other settings to fully automate ssh connection to the private k3s server node from gha pipeline
 
 ### Jenkins Installation:
  * In order to install jenkins, you obviously need to clone this repository
