@@ -1,13 +1,14 @@
 name: software_config
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - task_4
 
 env:
   SSH_PUBLIC_KEY: ${{ secrets.BASTION_SSH_PK }}
   SSH_PRIVATE_KEY: ${{ secrets.BASTION_SSH_PRV }}
-  BASTION_HOST: ${{ secrets.BASTION_HOST }}
-  K3S_SERVER_IP: ${{ secrets.K3S_SERVER_IP }}
-  K3S_AGENT_IP: ${{ secrets.K3S_AGENT_IP }}
 
 jobs:
   install_jenkins:
