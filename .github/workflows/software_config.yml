@@ -1,0 +1,35 @@
+name: software_configuration
+
+on:
+  workflow_dispatch:
+
+env:
+  TF_VAR_token: ${{ vars.TOKEN }}
+  TF_VAR_region: ${{ secrets.REGION }}
+  TF_VAR_ssh_pk: ${{ secrets.BASTION_SSH_PK }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  GHA_ROLE: ${{ secrets.GHA_ROLE }}
+  REGION: ${{ secrets.REGION }}
+  TERRAFORM_VERSION: ${{ secrets.TERRAFORM_VERSION }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.REGION  }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.GHA_ROLE }}
+
+      - name: Test
+        run: |
+          curl -IS https://www.rs.school
+          echo "Region: $REGION"
