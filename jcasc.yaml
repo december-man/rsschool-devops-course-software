@@ -91,7 +91,7 @@ jenkins:
         - "timezone"
         - "experimentalFlags"
         - mailer:
-            emailAddress: "<XXX_XXX_XXX_XXX_XXX>@gmail.com" # attach your email
+            emailAddress: "<XXX_XXX_XXX_XXX_XXX>@<XXX>.com" # attach your email
   slaveAgentPort: 50000
   updateCenter:
     sites:
