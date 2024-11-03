@@ -1,5 +1,7 @@
-# Jenkins Persistent Volume Configuration
-apiVersion: v1
+#!/bin/bash
+
+# Create Persistent Volume for Jenkins
+echo "apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: jenkins-pv
@@ -9,7 +11,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   capacity:
-    storage: 4Gi # Retain 4Gi (Out of 8Gi on free-tier ephemeral EBS volume)
+    storage: 4Gi
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /data/jenkins-volume/
@@ -20,4 +22,8 @@ kind: StorageClass
 metadata:
   name: jenkins-pv
 provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
+volumeBindingMode: WaitForFirstConsumer" >> ~/jenkins-volume.yaml
+
+sudo mkdir /data/jenkins -p
+sudo chown -R 1000:1000 /data/jenkins
+kubectl apply -f jenkins-volume.yaml
