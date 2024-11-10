@@ -12,7 +12,8 @@
 ``` bash
 ├── .github
 │   └── workflows
-│       └── jenkins_setup.yml
+│       ├── jenkins_setup.yml
+│       └── wordpress_deploy.yml
 ├── .gitignore
 ├── jenkins
 │   ├── jcasc.yaml
@@ -20,11 +21,24 @@
 │   ├── jenkins_install.sh
 │   ├── jenkins-values.yaml
 │   └── jenkins-volume.yaml
-├── wordpress
-│   ├── wordpress_install.sh
 ├── README.md
 ├── screenshots
-└── ssh_config_xmpl.sh
+├── ssh_config_xmpl.sh
+└── wordpress
+    ├── charts
+    ├── Chart.yaml
+    ├── .helmignore
+    ├── templates
+    │   ├── deployment.yaml
+    │   ├── _helpers.tpl
+    │   ├── mysql-deployment.yaml
+    │   ├── mysql-pvc.yaml
+    │   ├── mysql-service.yaml
+    │   ├── pvc.yaml
+    │   └── service.yaml
+    ├── values.yaml
+    └── wordpress_setup.sh
+
 ```
 
 **.github/workflows/jenkins_setup.yml:**
@@ -81,7 +95,7 @@
         StrictHostKeyChecking no
    ```
     This really comes in handy in the rest of `ssh` command calls.
- * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/software_config.yml* with `push:` or `pull_request` triggers
+ * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/jenkins_setup.yml* with `push:` or `pull_request` triggers
  * The `jenkins_install.sh` script will deploy a pod with jenkins. To access the Jenkins UI, ensure that you've thoroughly read and understood how to set up ssh SOCKS5 proxy and `KUBECONFIG` to run `kubectl` locally.
  * Run ssh SOCKS5 proxy.
  * In another terminal, locally forward Jenkin's 8080 port to localhost's 8080:
@@ -92,4 +106,56 @@
 
 ### Wordpress folder contents:
 
+**Chart.yaml:**
+
+  * This file contains metadata about the WordPress helm chart, such as its name, version, description. It's essential for Helm to understand the chart's purpose and versioning.
+
+**.helmignore:**
+
+  * This file works similarly to .gitignore. It specifies files and directories that should be ignored by Helm when packaging the chart. Common entries might include logs, temporary files, or any other unnecessary files.
+
+**templates/:**
+
+  * This directory contains the Kubernetes resource templates that Helm will use to generate the final manifests. Each file corresponds to a Kubernetes resource or a helper function.
+
+    **deployment.yaml:**
+      -  This template defines the Kubernetes Deployment for the WordPress application. It specifies how to manage the WordPress pods, including the container image, replicas, and environment variables.
+
+    **_helpers.tpl:**
+      -  This file contains reusable template snippets or functions that can be called from other templates. It helps to keep the templates DRY (Don't Repeat Yourself).
+
+    **mysql-deployment.yaml:**
+      -  This template defines the Deployment for the MySQL database that WordPress will use. It includes specifications for the MySQL container and its configuration.
+
+    **mysql-pvc.yaml:**
+      -  This template creates a PersistentVolumeClaim (PVC) for the MySQL database, ensuring that data persists even if the MySQL pod is restarted.
+
+    **mysql-service.yaml:**
+      -  This template defines a Kubernetes Service for the MySQL database, allowing other pods (like the WordPress pod) to communicate with it.
+
+    **pvc.yaml:**
+      -  This template creates a PersistentVolumeClaim (PVC) for the WordPress application, ensuring that data persists even if the WordPress pod is restarted.
+
+    **service.yaml:**
+      -  This template defines a Service for the WordPress application, which makes it accessible over the network.
+
+**values.yaml:**
+
+  * This file contains default configuration values for the chart. Users can override these values when installing or upgrading the chart. It usually includes settings for replicas, image versions, resource limits, and any other configurable options.
+
+**wordpress_setup.sh:**
+
+  * This script is used for initial setup tasks related to the WordPress installation via Github Actions Pipeline.
+
 ### Wordpress Installation:
+ * In order to install wordpress, you obviously need to clone this repository
+ * Just as with jenkins, you will need to set up all the necessary github secrets, that are mentioned in the *.github/workflows/jenkins_setup.yml*
+   - SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }} - passphrase for your ssh key that was used in k3s cluster setup
+   - SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }} - private ssh key that was used in k3s cluster setup 
+   - SSH_CONFIG: ${{ secrets.SSH_CONFIG }} - ssh configuration that defines connections
+   - SSH_WORDPRESS_PASSWORD" ${{ secrets.WORDPRESS_PASSWORD }} - password to use for WordPress application and its backend database
+ * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/wordpress_deploy.yml* with `push:` or `pull_request` triggers
+ * The `wordpress_install.sh` script will deploy a pod with wordpress, exposing the default 32000 port to access WordPress application using http protocol
+ * The Reverse-Proxy setup on Bastion Host will automatically forward the :32000 node port to port :80 on it, thus making WordPress application publically available via Cluster's EIP over http
+ * Open your browser and connect to your bastion's public ip using port 80 (or just http://)
+ * Now you can setup your WordPress Application!
