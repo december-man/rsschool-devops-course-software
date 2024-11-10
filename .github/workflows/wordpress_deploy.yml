@@ -1,0 +1,37 @@
+name: wordpress_deploy
+
+on: 
+##  push:
+##    paths:
+##      - 'wordpress/**'
+  workflow_dispatch:
+
+env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+  SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }}
+
+jobs:
+  install_wordpress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Connection
+        run: |
+          mkdir -p ~/.ssh
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
+          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
+          chmod 600 ~/.ssh/config
+
+      - name: Install & Configure Wordpress Page
+        run: |
+          if ssh k3s_server "kubectl get pods | grep -q 'wordpress'"; then
+            echo "Wordpress application is already deployed"
+          else 
+            echo "Setting Up Wordpress Application ... // ..." 
+            cat ${{ github.workspace }}/wordpress/wordpress_setup.sh | ssh k3s_server 'bash -s'
+          fi;

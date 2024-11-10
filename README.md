@@ -20,6 +20,8 @@
 │   ├── jenkins_install.sh
 │   ├── jenkins-values.yaml
 │   └── jenkins-volume.yaml
+├── wordpress
+│   ├── wordpress_install.sh
 ├── README.md
 ├── screenshots
 └── ssh_config_xmpl.sh
@@ -87,3 +89,7 @@
    `kubectl port-forward svc/jenkins 8080:8080 -n jenkins`
  
  * Now you can access Jenkins from your local machine! Just type in localhost:8080 in your browser.
+
+### Wordpress folder contents:
+
+### Wordpress Installation:
