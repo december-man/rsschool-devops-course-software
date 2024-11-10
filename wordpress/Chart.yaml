@@ -1,6 +1,7 @@
+# Custom WordPress helm chart by December-Man
 apiVersion: v2
 name: wordpress
-description: A Custom Helm chart for Kubernetes
+description: A Custom Helm chart for Kubernetes with MySQL backend
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -21,4 +22,10 @@ version: 0.1.2
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "6.6.2"
+appVersion: "6.6.2" #based of off WordPress container version
+
+keywords:
+  - application
+  - web
+  - blog
+  - wordpress
