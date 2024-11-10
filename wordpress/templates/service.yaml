@@ -1,3 +1,4 @@
+# WordPress Service Configuration
 apiVersion: v1
 kind: Service
 metadata:

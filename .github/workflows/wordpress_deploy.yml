@@ -32,6 +32,6 @@ jobs:
           if ssh k3s_server "kubectl get pods | grep -q 'wordpress'"; then
             echo "Wordpress application is already deployed"
           else 
-            echo "Setting Up Wordpress Application ... // ..." 
-            cat ${{ github.workspace }}/wordpress/wordpress_setup.sh | ssh k3s_server 'bash -s'
+            echo "Setting Up Wordpress Application ... // ..."
+            cat ${{ github.workspace }}/wordpress/wordpress_setup.sh | ssh k3s_server 'WORDPRESS_PASSWORD=${{ secrets.WORDPRESS_PASSWORD }} bash -s'
           fi;
