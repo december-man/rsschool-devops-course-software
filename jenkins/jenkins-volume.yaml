@@ -1,0 +1,23 @@
+# Jenkins Persistent Volume Configuration that is used in jenkins_install.sh
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv
+  namespace: jenkins
+spec:
+  storageClassName: jenkins-pv
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 4Gi # Retain 4Gi (Out of 8Gi on free-tier ephemeral EBS volume)
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/jenkins-volume/
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: jenkins-pv
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
