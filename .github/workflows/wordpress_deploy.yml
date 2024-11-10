@@ -1,9 +1,9 @@
 name: wordpress_deploy
 
 on: 
-##  push:
-##    paths:
-##      - 'wordpress/**'
+  push:
+    paths:
+      - 'wordpress/**'
   workflow_dispatch:
 
 env:

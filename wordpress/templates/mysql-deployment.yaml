@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress-mysql
+  template:
+    metadata:
+      labels:
+        app: wordpress-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.dbRootPassword }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.dbName }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.dbUser }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.mysql.dbPassword }}
+          ports:
+            - containerPort: {{ .Values.mysql.port }}
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
