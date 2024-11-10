@@ -1,0 +1,33 @@
+# Custom wordpress configuration with mysql backend
+
+# Wordpress configuration
+wordpress:
+  image:
+    repository: wordpress
+    tag: 6.6.2
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 80
+  dbHost: wordpress-mysql
+  dbName: wordpress
+  dbUser: wordpress
+  dbPassword: my-secret-password # override with env variable during installation
+
+# MySQL configuration
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: 5.7
+  port: 3306
+  dbRootPassword: root-password
+  dbName: wordpress
+  dbUser: wordpress
+  dbPassword: my-secret-password # override with env variable during installation
+
+# Persistence Configuration
+persistence:
+  enabled: true
+  storageClassName: local-path # default k3s storage class
+  accessMode: ReadWriteOnce
+  size: 2Gi
