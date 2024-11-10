@@ -1,9 +1,9 @@
 name: jenkins_setup
 
 on: 
-  # push:
-  #   paths:
-  #     - 'jenkins/**'
+  push:
+    paths:
+      - 'jenkins/**'
   workflow_dispatch:
   
 env:
