@@ -12,38 +12,24 @@
 ``` bash
 ├── .github
 │   └── workflows
-│       └── software_config.yml
+│       └── jenkins_setup.yml
 ├── .gitignore
-├── jcasc.yaml
-├── jenkins_install_dummy.sh
-├── jenkins_install.sh
-├── jenkins-values.yaml
-├── jenkins-volume.yaml
+├── jenkins
+│   ├── jcasc.yaml
+│   ├── jenkins_install_dummy.sh
+│   ├── jenkins_install.sh
+│   ├── jenkins-values.yaml
+│   └── jenkins-volume.yaml
 ├── README.md
 ├── screenshots
-└── ssh_config.md
+└── ssh_config_xmpl.sh
 ```
 
-**.github/workflows/software_config.yml:**
- * This file is part of GitHub Actions workflows. It defines a CI/CD workflow for automating tasks related to software configuration, such as installation of jenkins on a k3s cluster.
+**.github/workflows/jenkins_setup.yml:**
+ * This file is part of GitHub Actions workflows. It defines a CI/CD workflow for automating tasks related to jenkins installation & configuration.
 
 **.gitignore:**
  * This file specifies intentionally untracked files that Git should ignore. It includes patterns for files generated during builds, temporary files, or sensitive configuration files that should not be shared.
-
-**jcasc.yaml:**
- * This YAML file is used for Jenkins Configuration as Code (JCasC). It defines Jenkins settings, including security realms, job configurations, and plugins, allowing for automated Jenkins setup and configuration.
-
-**jenkins_install_dummy.sh:**
- * This shell script serves as a placeholder or example for installing Jenkins. Used during development process to test out ssh connection to k3s server instance from gha pipeline
-
-**jenkins_install.sh:**
- * This shell script is intended to automate the installation of Jenkins. It contains commands to install Jenkins and configure it on a k3s cluster. It also has a basic check to see if jenkins is already installed.
-
-**jenkins-values.yaml:**
- * This YAML file is used for configuring Helm charts for Jenkins deployment on Kubernetes. It contains values that customize the Helm chart installation, specifying things like resource limits, replicas, and configurations for Jenkins.
-
-**jenkins-volume.yaml:**
- * This file defines a Kubernetes persistent volume configuration for Jenkins. It specifies how data should be stored outside the Jenkins container, ensuring that data persists across deployments and restarts.
 
 **README.md:**
  * This is the file you are reading now.
@@ -54,9 +40,26 @@
 **ssh_config_xmpl.sh:**
  * This contains SSH configuration. It eases up the use of ssh ProxyJump, as well as other settings to fully automate ssh connection to the private k3s server node from gha pipeline
 
+### Jenkins folder contents
+
+**jenkins/jcasc.yaml:**
+ * This YAML file is used for Jenkins Configuration as Code (JCasC). It defines Jenkins settings, including security realms, job configurations, and plugins, allowing for automated Jenkins setup and configuration.
+
+**jenkins/jenkins_install_dummy.sh:**
+ * This shell script serves as a placeholder or example for installing Jenkins. Used during development process to test out ssh connection to k3s server instance from gha pipeline
+
+**jenkins/jenkins_install.sh:**
+ * This shell script is intended to automate the installation of Jenkins. It contains commands to install Jenkins and configure it on a k3s cluster. It also has a basic check to see if jenkins is already installed.
+
+**jenkins/jenkins-values.yaml:**
+ * This YAML file is used for configuring Helm charts for Jenkins deployment on Kubernetes. It contains values that customize the Helm chart installation, specifying things like resource limits, replicas, and configurations for Jenkins.
+
+**jenkins/jenkins-volume.yaml:**
+ * This file defines a Kubernetes persistent volume configuration for Jenkins. It specifies how data should be stored outside the Jenkins container, ensuring that data persists across deployments and restarts.
+
 ### Jenkins Installation:
  * In order to install jenkins, you obviously need to clone this repository
- * Then set up all the necessary github secrets, that are mentioned in the *.github/workflows/software_config.yml*
+ * Then set up all the necessary github secrets, that are mentioned in the *.github/workflows/jenkins_setup.yml*
    - SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }} - passphrase for your ssh key that was used in k3s cluster setup
    - SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }} - private ssh key that was used in k3s cluster setup 
    - SSH_CONFIG: ${{ secrets.SSH_CONFIG }} - ssh configuration that defines connections, e.g.:
@@ -77,7 +80,7 @@
    ```
     This really comes in handy in the rest of `ssh` command calls.
  * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/software_config.yml* with `push:` or `pull_request` triggers
- * The `jenkins_install.sh` script will deploy a pod with jenkins. To access the Jenkins UI, ensure that you've thoroughly read and understood how to set up ssh SOCKS5 proxy and `KUBECONFIG` to run `kubectl` locally. 
+ * The `jenkins_install.sh` script will deploy a pod with jenkins. To access the Jenkins UI, ensure that you've thoroughly read and understood how to set up ssh SOCKS5 proxy and `KUBECONFIG` to run `kubectl` locally.
  * Run ssh SOCKS5 proxy.
  * In another terminal, locally forward Jenkin's 8080 port to localhost's 8080:
 

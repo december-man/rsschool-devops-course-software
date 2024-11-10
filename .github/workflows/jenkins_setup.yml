@@ -1,6 +1,9 @@
-name: software_config
+name: jenkins_setup
 
 on: 
+  push:
+    paths:
+      - 'jenkins/**'
   workflow_dispatch:
   
 env:
