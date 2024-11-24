@@ -1,0 +1,36 @@
+# MySQL deployment configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+spec:
+  replicas: {{ .Values.wordpress.replicas }}
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - name: wordpress
+          image: {{ .Values.wordpress.image.repository }}:{{ .Values.wordpress.image.tag }}
+          ports:
+            - containerPort: {{ .Values.wordpress.port }}
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: {{ .Values.wordpress.dbHost }}
+            - name: WORDPRESS_DB_NAME
+              value: {{ .Values.wordpress.dbName }}
+            - name: WORDPRESS_DB_USER
+              value: {{ .Values.wordpress.dbUser }}
+            - name: WORDPRESS_DB_PASSWORD
+              value: {{ .Values.wordpress.dbPassword }}
+          volumeMounts:
+            - name: wordpress-persistent-storage
+              mountPath: /var/www/html
+      volumes:
+        - name: wordpress-persistent-storage
+          persistentVolumeClaim:
+            claimName: wordpress-pvc

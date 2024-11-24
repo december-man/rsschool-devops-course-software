@@ -1,0 +1,13 @@
+# WordPress Service Configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: {{ .Values.wordpress.port }}
+      nodePort: 32000
+  selector:
+    app: wordpress
