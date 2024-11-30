@@ -4,7 +4,9 @@ helm repo update
 # Add k3s namespace for monitoring utilities
 kubectl create namespace monitoring
 # Install prometheus in the monitoring namespace
-helm upgrade prometheus bitnami/kube-prometheus --install --namespace monitoring \
+helm upgrade prometheus bitnami/kube-prometheus \
+  --install \
+  --namespace monitoring \
   --set service.type=NodePort \
   --set service.port=32000 \
   --set service.nodePort=32000
