@@ -9,7 +9,7 @@ helm upgrade prometheus bitnami/kube-prometheus --install --namespace monitoring
 echo 'Waiting for the installation to complete ...'
 sleep 90
 # Move Prometheus Service to NodePort
-echo "Updating Prometheus service to NodePort ..."
+echo 'Updating Prometheus service to NodePort ...'
 kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring \
   --type='json' -p='[
     {"op": "replace", "path": "/spec/type", "value": "NodePort"},
@@ -17,8 +17,11 @@ kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring \
   ]'
 sleep 5
 # Check all the prometheus pods for issues
+echo 'Get Pods to verify that Prometheus is up and running:'
 kubectl get pods -n monitoring
 # Check Monitoring Services
+echo 'Get Services to verify that Prometheus is up and running:'
 kubectl get svc -n monitoring
 # Check prometheus UI availability
-curl http://localhost:32000/graph
+echo 'Check Prometheus UI availability on NodePort 32000:'
+curl http://localhost:32000/
