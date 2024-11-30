@@ -1,6 +1,5 @@
 # Add bitnami helm repo
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
 # Add k3s namespace for monitoring utilities
 kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 # Install prometheus in the monitoring namespace
