@@ -28,4 +28,5 @@ chart=jenkinsci/jenkins
 helm install jenkins -n jenkins -f jenkins-values.yaml $chart
 
 # Get Admin Password
+sleep 90
 kubectl exec --namespace jenkins -it svc/jenkins -c jenkins -- /bin/cat /run/secrets/additional/chart-admin-password && echo
