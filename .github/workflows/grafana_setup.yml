@@ -13,7 +13,7 @@ env:
   GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
 
 jobs:
-  install_prometheus:
+  install_grafana:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
