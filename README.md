@@ -13,6 +13,7 @@
 ├── .github
 │   └── workflows
 │       ├── jenkins_setup.yml
+│       ├── prometheus_setup.yml
 │       └── wordpress_deploy.yml
 ├── .gitignore
 ├── jenkins
@@ -22,6 +23,8 @@
 │   ├── jenkins-values.yaml
 │   └── jenkins-volume.yaml
 ├── README.md
+├── prometheus
+│   └── prometheus_install.sh
 ├── screenshots
 ├── ssh_config_xmpl.sh
 └── wordpress
@@ -41,7 +44,7 @@
 
 ```
 
-**.github/workflows/jenkins_setup.yml:**
+**.github/workflows/:**
  * This file is part of GitHub Actions workflows. It defines a CI/CD workflow for automating tasks related to jenkins installation & configuration.
 
 **.gitignore:**
@@ -149,7 +152,7 @@
 
 ### Wordpress Installation:
  * In order to install wordpress, you obviously need to clone this repository
- * Just as with jenkins, you will need to set up all the necessary github secrets, that are mentioned in the *.github/workflows/jenkins_setup.yml*
+ * Just as with jenkins, you will need to set up all the necessary github secrets, that are mentioned in the *.github/workflows/wordpress_setup.yml*
    - SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }} - passphrase for your ssh key that was used in k3s cluster setup
    - SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }} - private ssh key that was used in k3s cluster setup 
    - SSH_CONFIG: ${{ secrets.SSH_CONFIG }} - ssh configuration that defines connections
@@ -159,3 +162,20 @@
  * The Reverse-Proxy setup on Bastion Host will automatically forward the :32000 node port to port :80 on it, thus making WordPress application publically available via Cluster's EIP over http
  * Open your browser and connect to your bastion's public ip using port 80 (or just http://)
  * Now you can setup your WordPress Application!
+
+### Prometheus folder contents
+
+**prometheus/prometheus_install.sh:**
+ * This shell script is intended to automate the installation of Prometheus. It contains commands to install Prometheus and configure it on a k3s cluster. It also has a basic check to see if prometheus is already installed.
+
+### Prometheus Installation:
+ * Just like in any other case, in order to install prometheus, you need to clone this repository.
+ * Then set up all the necessary github secrets, that are mentioned in the *.github/workflows/prometheus_setup.yml*
+   - SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }} - passphrase for your ssh key that was used in k3s cluster setup
+   - SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }} - private ssh key that was used in k3s cluster setup 
+   - SSH_CONFIG: ${{ secrets.SSH_CONFIG }} - ssh configuration that defines connections (example is shown above)
+ * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/prometheus_setup.yml* with `push:` or `pull_request` triggers
+ * The `prometheus_install.sh` script will deploy prometheus on your k3s cluster, exposing port 32000 for Prometheus UI (http protocol)
+ * The Reverse-Proxy setup on Bastion Host will automatically forward the :32000 node port to port :80 on it, thus making WordPress application publically available via Cluster's EIP over http. Don't forget to check your reverse-proxy setup in Bastion Host to match the k3s server private ip address! The nginx proxy config executes during [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
+ * Open your browser and connect to your bastion's public ip (EIP) using port 80 (or just http://)
+ * Now you can use Prometheus UI to query some informative metrics about your cluster!
