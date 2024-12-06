@@ -12,10 +12,15 @@
 ``` bash
 ├── .github
 │   └── workflows
+│       ├── grafana_setup.yml
 │       ├── jenkins_setup.yml
 │       ├── prometheus_setup.yml
 │       └── wordpress_deploy.yml
 ├── .gitignore
+├── grafana
+│   ├── grafana_dash.json
+│   ├── grafana_install.sh
+│   └── grafana_values.yaml
 ├── jenkins
 │   ├── jcasc.yaml
 │   ├── jenkins_install_dummy.sh
@@ -166,16 +171,39 @@
 ### Prometheus folder contents
 
 **prometheus/prometheus_install.sh:**
- * This shell script is intended to automate the installation of Prometheus. It contains commands to install Prometheus and configure it on a k3s cluster. It also has a basic check to see if prometheus is already installed.
+ * This shell script is intended to automate the installation of Prometheus. It contains commands to install Prometheus and configure it on a k3s cluster. It also has a basic check to see if Prometheus is already installed.
 
 ### Prometheus Installation:
- * Just like in any other case, in order to install prometheus, you need to clone this repository.
+ * Just like in any other case, in order to install Prometheus, you need to clone this repository.
  * Then set up all the necessary github secrets, that are mentioned in the *.github/workflows/prometheus_setup.yml*
    - SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }} - passphrase for your ssh key that was used in k3s cluster setup
    - SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }} - private ssh key that was used in k3s cluster setup 
    - SSH_CONFIG: ${{ secrets.SSH_CONFIG }} - ssh configuration that defines connections (example is shown above)
  * Manually trigger the workflow in *Actions* tab, or modify the `on:` setting in *.github/workflows/prometheus_setup.yml* with `push:` or `pull_request` triggers
- * The `prometheus_install.sh` script will deploy prometheus on your k3s cluster, exposing port 32000 for Prometheus UI (http protocol)
- * The Reverse-Proxy setup on Bastion Host will automatically forward the :32000 node port to port :80 on it, thus making WordPress application publically available via Cluster's EIP over http. Don't forget to check your reverse-proxy setup in Bastion Host to match the k3s server private ip address! The nginx proxy config executes during [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
+ * The `prometheus_install.sh` script will deploy Prometheus on your k3s cluster, exposing port 32000 for Prometheus UI (http protocol)
+ * The Reverse-Proxy setup on Bastion Host will automatically forward the :32000 node port to port :80 on it, thus making Prometheus application publically available via Cluster's EIP over http. Don't forget to check your reverse-proxy setup in Bastion Host to match the k3s server private ip address! The nginx proxy config executes during [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
  * Open your browser and connect to your bastion's public ip (EIP) using port 80 (or just http://)
  * Now you can use Prometheus UI to query some informative metrics about your cluster!
+
+### Grafana folder contents
+
+**grafana_dash.json:**
+ * A JSON Model of a Dashboard to be used for metrics visualization.
+
+**grafana_install.sh:**
+ * This shell script is intended to automate the installation of Grafana. It contains commands to install and configure Grafana on a k3s cluster. It also has a basic check to see if Grafana is already installed.
+
+**grafana_values.yaml:**
+ * Grafana Chart Configuration file for Helm deployment
+
+### Grafana Installation
+
+#### Grafana can be installed only if Prometheus is deployed. Hence, the pipeline in Github Actions includes a step with Prometheus installation as well.
+ * Clone this repository and prepare [k3s cluster infrastracture](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/)
+ * On k3s cluster, **run Prometheus installation script**. Don't forget about GitHub Secrets:
+   - GRAFANA_PASSWORD: Admin user password to authenticate into Grafana UI.
+   - SSH secrets (see Prometheus installation)
+ * After installing Prometheus, use `grafana_install.sh` script to deploy Grafana on your k3s cluster, exposing port 32001 for Grafana UI (http protocol)
+ * The Reverse-Proxy setup on Bastion Host will automatically forward the :32001 node port to port :80 on it, leaving Prometheus on the same address but on a special path: `<BASTION_PUBLIC_IP>/app` thus making Grafana UI publically available via Cluster's EIP over http. Don't forget to check your reverse-proxy setup in Bastion Host: [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
+ * Open your browser and connect to your bastion's public ip (EIP) using port 80 (or just http://). Note that the main (/) path will direct you to Grafana, and `/app` path will direct you to Prometheus.
+ * Now you can use Grafana to build some fancy dashboards, containing various, Prometheus-based metrics about your cluster!

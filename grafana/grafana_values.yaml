@@ -1,0 +1,20 @@
+service:
+  type: NodePort
+  nodePorts:
+    grafana: "32001"
+datasources:
+  secretDefinition:
+    apiVersion: 1
+    datasources: # Add Existing Prometheus Source
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-kube-prometheus-prometheus:9090 
+      isDefault: true
+admin: # Admin User with a separate secret password
+  existingSecret: "grafana-admin-pw"
+  existingSecretPasswordKey: password
+dashboardsProvider: # Feed a dashboard to Grafana
+  enabled: true
+dashboardsConfigMaps:
+  - configMapName: "grafana-dash"
+    fileName: grafana_dash.json
