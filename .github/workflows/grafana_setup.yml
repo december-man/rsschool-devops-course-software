@@ -1,0 +1,47 @@
+name: grafana_setup
+
+on: 
+  push:
+    paths:
+      - 'grafana/**'
+  workflow_dispatch:
+  
+env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+  SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRV }}
+  GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
+
+jobs:
+  install_grafana:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Connection
+        run: |
+          mkdir -p ~/.ssh
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
+          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config  # Load SSH config file from secrets to simplify the code
+          chmod 600 ~/.ssh/config
+
+      - name: Install Prometheus
+        run: |
+          if ssh k3s_server "kubectl get pods -n monitoring | grep -q 'prometheus'"; then
+            echo "Prometheus is already deployed on the k3s cluster"
+          else 
+            echo "Installing Prometheus .... // ...." 
+            cat ${{ github.workspace }}/prometheus/prometheus_install.sh | ssh k3s_server 'bash -s'
+          fi;
+
+      - name: Install Grafana
+        run: |
+          if ssh k3s_server "kubectl get pods -n monitoring | grep -q 'grafana'"; then
+            echo "Grafana is already installed on the k3s cluster"
+          else 
+            echo "Installing Grafana .... // ...." 
+            cat ${{ github.workspace }}/grafana/grafana_install.sh | ssh k3s_server 'GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }} bash -s'
+          fi;
