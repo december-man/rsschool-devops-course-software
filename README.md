@@ -50,7 +50,7 @@
 ```
 
 **.github/workflows/:**
- * This file is part of GitHub Actions workflows. It defines a CI/CD workflow for automating tasks related to jenkins installation & configuration.
+ * This file is part of GitHub Actions workflows. It defines a CI/CD workflow for automating tasks related to software installation & configuration.
 
 **.gitignore:**
  * This file specifies intentionally untracked files that Git should ignore. It includes patterns for files generated during builds, temporary files, or sensitive configuration files that should not be shared.
