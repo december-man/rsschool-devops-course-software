@@ -14,11 +14,23 @@ datasources:
       isDefault: true
 # Admin User with a separate secret password
 admin:
-  existingSecret: "grafana-admin-pw"
+  existingSecret: grafana-admin-pw
   existingSecretPasswordKey: password
 # Feed a dashboard to Grafana
 dashboardsProvider:
   enabled: true
 dashboardsConfigMaps:
-  - configMapName: "grafana-dash"
+  - configMapName: grafana-dash
     fileName: grafana_dash.json
+# Setup Grafana Email Alerts using AWS SES (fromAddress: email address verified in SES)
+smtp:
+  enabled: true
+  host: email-smtp.eu-central-1.amazonaws.com:587
+  fromName: "Grafana"
+  fromAddress: alexpequalsmc@gmail.com
+  existingSecret: grafana-smtp-ses
+  existingSecretUserKey: user
+  existingSecretPasswordKey: password
+# Feed alert rules and contact points to Grafana
+alerting:
+  configMapName: grafana-alerts

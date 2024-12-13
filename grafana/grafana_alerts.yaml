@@ -1,0 +1,179 @@
+# Create a contact point
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: Admin
+    receivers:
+      - uid: "u-n-i-q-u-e-i-d"
+        type: email
+        settings:
+          addresses: alexpequalsmc@gmail.com
+          singleEmail: false
+        disableResolveMessage: false
+# Add CPU & RAM Load Alerts
+groups:
+  - orgId: 1
+    name: eval-group
+    folder: alerts
+    interval: 30s
+    rules:
+      - uid: de6t4y75i3e2od
+        title: High CPU User Time
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              editorMode: code
+              expr: avg(rate(node_cpu_seconds_total{mode="user"}[1m])) by (instance)
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                  - evaluator:
+                      params: []
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                          - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                  - evaluator:
+                      params:
+                          - 0.8
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                          - C
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: ce63g4nv7591cb
+        panelId: 1
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: ce63g4nv7591cb
+          __panelId__: "1"
+          summary: High CPU Load Detected! Please look into your k8s Cluster!
+        isPaused: false
+        notification_settings:
+          receiver: Admin
+      - uid: be6t63vq66olcb
+        title: High RAM Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              editorMode: code
+              expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                  - evaluator:
+                      params: []
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                          - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                  - evaluator:
+                      params:
+                          - 0.7
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                          - C
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        dashboardUid: ce63g4nv7591cb
+        panelId: 2
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        annotations:
+          __dashboardUid__: ce63g4nv7591cb
+          __panelId__: "2"
+          summary: High RAM Load Alert Indicates that at least one of the cluster nodes experiences high RAM Usage
+        isPaused: false
+        notification_settings:
+          receiver: Admin
