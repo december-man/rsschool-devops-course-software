@@ -45,9 +45,9 @@ jobs:
             echo "Grafana is already installed on the k3s cluster"
           else 
             echo "Installing Grafana .... // ...." 
-            cat ${{ github.workspace }}/grafana/grafana_install.sh | ssh k3s_server \
-             'GRAFANA_PASSWORD=$GRAFANA_PASSWORD \
+            cat ${{ github.workspace }}/grafana/grafana_install.sh | ssh k3s_server "
+              GRAFANA_PASSWORD=$GRAFANA_PASSWORD \
               GRAFANA_SMTP_SES_USER=$GRAFANA_SMTP_SES_USER \
               GRAFANA_SMTP_SES_PASSWORD=$GRAFANA_SMTP_SES_PASSWORD \
-              bash -s'
+              bash -s"
           fi;
