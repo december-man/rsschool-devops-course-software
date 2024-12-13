@@ -21,5 +21,6 @@ sleep 90
 
 echo 'Checking installation...'
 kubectl get svc,pods,deployment -n monitoring
+
 echo 'Check Prometheus UI availability on NodePort 32001:'
 curl http://localhost:32001/

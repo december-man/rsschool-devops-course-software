@@ -18,6 +18,7 @@
 │       └── wordpress_deploy.yml
 ├── .gitignore
 ├── grafana
+│   ├── grafana_alerts.yaml
 │   ├── grafana_dash.json
 │   ├── grafana_install.sh
 │   └── grafana_values.yaml
@@ -187,6 +188,9 @@
 
 ### Grafana folder contents
 
+**grafana_alerts.yaml:**
+ * This file contains Grafana Email Alerting Setup: SMTP server configuration & Alerts.
+
 **grafana_dash.json:**
  * A JSON Model of a Dashboard to be used for metrics visualization.
 
@@ -196,14 +200,18 @@
 **grafana_values.yaml:**
  * Grafana Chart Configuration file for Helm deployment
 
-### Grafana Installation
+### Grafana Installation (Alerting included!)
 
 #### Grafana can be installed only if Prometheus is deployed. Hence, the pipeline in Github Actions includes a step with Prometheus installation as well.
- * Clone this repository and prepare [k3s cluster infrastracture](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/)
- * On k3s cluster, **run Prometheus installation script**. Don't forget about GitHub Secrets:
-   - GRAFANA_PASSWORD: Admin user password to authenticate into Grafana UI.
+ * Clone this repository's contents and prepare [k3s cluster infrastracture](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/)
+ * Setup AWS SES using your email & your company's domain name. Get AWS SES User Credentials (SMTP User name & Password). You will need them to be able to send Email notifications on Alerts. Note that you can use any other smtp server, like `smtp.gmail.com`. So make sure to specify it and your valid `fromAddress` email in `grafana_values.yaml` as well as target email addresses in `grafana_alerts.yaml`!
+ * After that you can trigger the GHA pipeline to install Grafana. But don't forget about GitHub Secrets!
+   - GRAFANA_PASSWORD: Admin user password to authenticate into Grafana UI
+   - GRAFANA_SMTP_SES_USER: SMTP Username for AWS SES
+   - GRAFANA_SMTP_SES_PASSWORD: SMTP Password for AWS SES
    - SSH secrets (see Prometheus installation)
- * After installing Prometheus, use `grafana_install.sh` script to deploy Grafana on your k3s cluster, exposing port 32001 for Grafana UI (http protocol)
- * The Reverse-Proxy setup on Bastion Host will automatically forward the :32001 node port to port :80 on it, leaving Prometheus on the same address but on a special path: `<BASTION_PUBLIC_IP>/app` thus making Grafana UI publically available via Cluster's EIP over http. Don't forget to check your reverse-proxy setup in Bastion Host: [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
- * Open your browser and connect to your bastion's public ip (EIP) using port 80 (or just http://). Note that the main (/) path will direct you to Grafana, and `/app` path will direct you to Prometheus.
- * Now you can use Grafana to build some fancy dashboards, containing various, Prometheus-based metrics about your cluster!
+ * The `grafana_install.sh` script will deploy Grafana on your cluster, don't forget to patch it with correct curl url's, if you're planning on forking this project. Grafana UI will be exposed on port 32001.
+ * The Reverse-Proxy on Bastion Host will automatically forward the :32001 node port to port :80 on it. It will keep Prometheus on the same address but on a special path `<BASTION_PUBLIC_IP>/app`, while Grafana will be kept in root `<BASTION_PUBLIC_IP>/`. Don't forget to twice-check your reverse-proxy setup in Bastion Host: [Bastion Host deployement (user_data) ](https://github.com/december-man/rsschool-devops-course-infrastrutture/blob/main/bastion_host.sh)
+ * Open your browser and connect to your bastion's public ip (EIP) using port 80 (or just http://). Remember that the main (/) path will direct you to Grafana, and `/app` path will direct you to Prometheus.
+ * Grafana Alerting system will be already deployed: the contact point (E-mail) will be set up, as well as basic CPU/RAM load alerts that are bound to the Dashboard template stored in `grafana_dash.json`. You can add yours if you like, don't forget to export them to `grafana_alerts.yaml`! Same goes to dashboard modifications - update `grafana_dash.json`.
+ * Now you got yourself a k3s cluster with a basic monitoring system!
