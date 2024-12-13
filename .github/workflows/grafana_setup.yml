@@ -1,9 +1,9 @@
 name: grafana_setup
 
 on: 
-  # push:
-  #   paths:
-  #     - 'grafana/**'
+  push:
+    paths:
+      - 'grafana/**'
   workflow_dispatch:
   
 env:
