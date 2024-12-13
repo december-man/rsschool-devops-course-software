@@ -9,7 +9,7 @@ kubectl create configmap grafana-dash -n monitoring --from-file=grafana_dash.jso
 
 echo 'Setting up Grafana Alerting System...'
 echo 'Setting up Alerts and Email Notifications...'
-curl -o ~/grafana_values.yaml https://raw.githubusercontent.com/december-man/rsschool-devops-course-software/refs/heads/task_9/grafana/grafana_alerts.yaml
+curl -o ~/grafana_alerts.yaml https://raw.githubusercontent.com/december-man/rsschool-devops-course-software/refs/heads/task_9/grafana/grafana_alerts.yaml
 kubectl create configmap grafana-alerts -n monitoring --from-file=grafana_alerts.yaml
 
 echo 'Grabbing Grafana Helm Chart configuration...'
@@ -21,3 +21,5 @@ sleep 90
 
 echo 'Checking installation...'
 kubectl get svc,pods,deployment -n monitoring
+echo 'Check Prometheus UI availability on NodePort 32001:'
+curl http://localhost:32001/
